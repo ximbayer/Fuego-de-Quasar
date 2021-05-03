@@ -4,9 +4,12 @@ import (
 	"github.com/ximbayer/Fuego-de-Quasar/models"
 )
 
-func GetSatellites(req models.Request) (satellites []string) {
-	for _, satellite := range req.Satellites {
-		satellites = append(satellites, satellite.NameSatell)
-	}
-	return satellites
+//get all the satellites that are operating
+func GetAllSatellitesOperatingData() (TotalSatellitesOperating []models.Satellite) {
+	TotalSatellitesOperating = append(TotalSatellitesOperating,
+		models.Satellite{Name: "Kenobi", XCoordinate: -500, YCoordinate: -200},
+		models.Satellite{Name: "Skywalker", XCoordinate: 100, YCoordinate: -100},
+		models.Satellite{Name: "Sato", XCoordinate: 500, YCoordinate: 100})
+
+	return
 }

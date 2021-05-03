@@ -9,6 +9,7 @@ var NoSolutionLocation = fmt.Errorf("No solution for localization.")
 var CoordinatesError = fmt.Errorf("The number of coordinates to analyze is incorrect. It must be one, two, or three maximum coordinates.")
 var NoSolutionMessages = fmt.Errorf("The message cannot be decrypted.")
 
+//create the struct of point in the coordinates
 type Point struct {
 	X float64
 	Y float64
@@ -17,6 +18,7 @@ type Point struct {
 
 var SatellCoordinates []Point
 
+//function to process data. I used this function as a middleware to call the others function to get the location and the message
 func ProcessData(coordinates []Point, distances []float64, messages [][]string) (xcoord float64, ycoord float64, message string, errLocation string, errMessage string) {
 	SatellCoordinates = coordinates
 	xcoord, ycoord, errLocation = GetLocation(distances...)
@@ -25,6 +27,7 @@ func ProcessData(coordinates []Point, distances []float64, messages [][]string) 
 }
 
 //X= 9999999999 and Y=9999999999 is an incorrect coordinate. These values are to represent an error in the Location
+//if we have 3 coordinate points, we will have 3 distances. If we have 3 distances, we will have 3 coordinate points
 func GetLocation(distances ...float64) (xcoord float64, ycoord float64, err string) {
 	countCoordinates := len(SatellCoordinates)
 	p1 := Point{}
@@ -52,6 +55,7 @@ func GetLocation(distances ...float64) (xcoord float64, ycoord float64, err stri
 	d := normalize(subtract(p2, p1))
 	j := dot(ey, subtract(p3, p1))
 
+	//calculate X and Y for the coordinate
 	x := (square(p1.R) - square(p2.R) + square(d)) / (2 * d)
 	y := (square(p1.R)-square(p3.R)+square(i)+square(j))/(2*j) - (i/j)*x
 

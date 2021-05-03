@@ -8,11 +8,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-/*Connector to the DB  */
+//Connector to the DB
 var Connector = DBConnect()
 var clientOptions = options.Client().ApplyURI("mongodb+srv://ximbayer:eav-1234@clustermeli.89pnn.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
 
-/*DBConnect es la función que me permite conectar la BD */
+//DBConnect is the function that allows me to connect the BD
 func DBConnect() *mongo.Client {
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
@@ -32,7 +32,7 @@ func DBConnect() *mongo.Client {
 	return client
 }
 
-/*ConnectionCheck is the ping to DB by the Connetor*/
+//ConnectionCheck is the ping to DB by the Connetor
 func ConnectionCheck() int {
 	err := Connector.Ping(context.TODO(), nil)
 	if err != nil {

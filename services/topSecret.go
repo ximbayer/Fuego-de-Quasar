@@ -9,46 +9,52 @@ import (
 	"github.com/ximbayer/Fuego-de-Quasar/models"
 )
 
-//totalSatellitesOperating is an array with the total satellites operating in Quasar
-var TotalSatellitesOperating []models.Satellite
+//TotalSatellitesOperating is an array with the total satellites operating in Quasar
+var TotalSatellitesOperating []models.Satellite = functions.GetAllSatellitesOperatingData()
 
-/*Registro es la funcion para crear en la BD el registro de usuario */
+//ShipRequest is a model to load all ship requests to satellites
+var ShipRequest models.Request
+
+//TopSecret is the service to obtain the ubication and urgency message of the ship
 func TopSecret(w http.ResponseWriter, r *http.Request) {
-	TotalSatellitesOperating = append(TotalSatellitesOperating,
-		models.Satellite{Name: "Kenobi", XCoordinate: -500, YCoordinate: -200},
-		models.Satellite{Name: "Skywalker", XCoordinate: 100, YCoordinate: -100},
-		models.Satellite{Name: "Sato", XCoordinate: 500, YCoordinate: 100})
-	var request models.Request
-	err := json.NewDecoder(r.Body).Decode(&request)
+	err := json.NewDecoder(r.Body).Decode(&ShipRequest)
 	if err != nil {
 		//fmt.Fprintln(w, "Incorrect data. "+err.Error(), request)
 		fmt.Fprintln(w, "Incorrect data. "+err.Error(), 400)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	for _, satellite := range request.Satellites {
+	for _, satellite := range ShipRequest.ShipToSatellites {
 		if satellite.NameSatell == "" {
 			http.Error(w, "The name of all satellites is required.", 400)
 			return
 		}
 	}
-	//recorre los satelites enviados por el consumidor
-	satellitesRequest := functions.GetSatellites(request)
-	coordinates := functions.GetCoordinates(satellitesRequest, TotalSatellitesOperating)
-	distances := functions.GetDistances(request)
 
-	messages := functions.GetMessages(request)
+	//if we have more than 3 satellites, only we could get the message, but no the location
+	if len(ShipRequest.ShipToSatellites) > 3 {
+		fmt.Fprintf(w, "Too many satellites")
+		return
+	}
 
-	// obtiene la ubicacion de la nave que envio los llamados de auxilio.
+	//it goes through the satellites sent by the consumer for the ship (ShipToSatellites) and obtains their data
+	coordinates := functions.GetCoordinates(ShipRequest.ShipToSatellites, TotalSatellitesOperating)
+	distances := functions.GetDistances(ShipRequest.ShipToSatellites)
+	messages := functions.GetMessages(ShipRequest.ShipToSatellites)
+
+	// get the ubication and urgency message of the ship
 	//x, y := functions.GetLocation(distances...)
-	x, y, message, _, _ := functions.ProcessData(coordinates, distances, messages)
+	//message := functions.GetMessage(messages...)
+	x, y, message, errLocation, errMessage := functions.ProcessData(coordinates, distances, messages)
+
+	//create a Position model to load
 	pos := models.Position{XCoordinate: x, YCoordinate: y}
 
 	resp := models.Response{Position: pos, Message: message}
 	w.Header().Set("Content-Type", "application/json")
 
 	//For validation: X= 9999999999 and Y=9999999999 is an incorrect coordinate. These values are to represent an error in the GetLocation
-	if x == 9999999999 || y == 9999999999 || message == "" {
+	if x == 9999999999 || y == 9999999999 || message == "" || errLocation != "" || errMessage != "" {
 		w.WriteHeader(http.StatusNotFound)
 		errorMessage := "The ship information could not be got"
 		json.NewEncoder(w).Encode(errorMessage)

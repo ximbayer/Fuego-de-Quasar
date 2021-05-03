@@ -4,6 +4,7 @@ import (
 	"math"
 )
 
+//here are all the auxiliary function to calculate trilateration for the ship location
 func square(v float64) float64 {
 	return v * v
 }

@@ -11,6 +11,8 @@ import (
 	"github.com/ximbayer/Fuego-de-Quasar/services"
 )
 
+var Hola string
+
 /*Manejadores seteo mi puerto, el Handler y pongo a escuchar al Servidor */
 func Handlers() {
 	//with StrictSlash: accept that the last slash of the url will be valid
@@ -31,6 +33,7 @@ func Handlers() {
 	log.Fatal(http.ListenAndServe(":"+PORT, handler))
 }
 
+//return the PORT to listen and serve
 func DefinePort() string {
 	PORT := os.Getenv("PORT")
 	if PORT == "" {
