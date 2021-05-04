@@ -37,13 +37,19 @@ func GetLocation(distances ...float64) (xcoord float64, ycoord float64, err stri
 	switch countCoordinates {
 	case 1:
 		p1 = SatellCoordinates[0]
+		p1.R = distances[0]
 	case 2:
 		p1 = SatellCoordinates[0]
+		p1.R = distances[0]
 		p2 = SatellCoordinates[1]
+		p2.R = distances[1]
 	case 3:
 		p1 = SatellCoordinates[0]
+		p1.R = distances[0]
 		p2 = SatellCoordinates[1]
+		p2.R = distances[1]
 		p3 = SatellCoordinates[2]
+		p3.R = distances[2]
 	default:
 		return 9999999999, 9999999999, CoordinatesError.Error()
 	}
@@ -88,6 +94,7 @@ func GetMessage(messages ...[]string) (msg string, err string) {
 		for _, m := range messages {
 			//Get the mismatch of the current message
 			messageMismatch := len(m) - lengthMin
+
 			//Verify mismatch of the current message. If it is positive, we will move the number of this mismatch in the current message to the right
 			if messageMismatch > 0 {
 				//Verify the word in the current message. If it is not "", we will append it to the message slice
@@ -100,7 +107,7 @@ func GetMessage(messages ...[]string) (msg string, err string) {
 			} else {
 				//If the mismatch of the current message is 0 (zero), we don´t need to move in the current message because it is not necessary
 				if m[i] != "" {
-					if !strings.Contains(strings.Join(message, " "), m[i]) {
+					if !contains(message, m[i]) {
 						message = append(message, m[i])
 						break
 					}
@@ -113,4 +120,14 @@ func GetMessage(messages ...[]string) (msg string, err string) {
 	}
 	msg = strings.Join(message, " ")
 	return msg, ""
+}
+
+//function to know if a string is already upload in the slice
+func contains(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }

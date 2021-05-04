@@ -21,10 +21,18 @@ func GetTopSecretSplit(w http.ResponseWriter, r *http.Request) {
 	distances := functions.GetDistances(NewShipRequest.ShipToSatellites)
 	messages := functions.GetMessages(NewShipRequest.ShipToSatellites)
 
+	//if coordinates slice is nil, no satellite of those analyzed is operational
+	if coordinates == nil {
+		w.WriteHeader(http.StatusBadRequest)
+		errorMessage := "The location information of the ship could not be got since no satellite of those analyzed is operational"
+		json.NewEncoder(w).Encode(errorMessage)
+		return
+	}
+
 	// get the ubication and urgency message of the ship
 	//x, y := functions.GetLocation(distances...)
 	//message := functions.GetMessage(messages...)
-	x, y, message, _, _ := functions.ProcessData(coordinates, distances, messages)
+	x, y, message, errLocation, errMessage := functions.ProcessData(coordinates, distances, messages)
 
 	//create a Position model to load
 	pos := models.Position{XCoordinate: x, YCoordinate: y}
@@ -33,21 +41,22 @@ func GetTopSecretSplit(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	//For validation: X= 9999999999 and Y=9999999999 is an incorrect coordinate. These values are to represent an error in the GetLocation
-	if x == 9999999999 || y == 9999999999 || message == "" {
+	if x == 9999999999 || y == 9999999999 || errLocation != "" {
 		w.WriteHeader(http.StatusNotFound)
-		errorMessage := "The ship information could not be got"
+		errorMessage := "The location information of the ship could not be got"
+		json.NewEncoder(w).Encode(errorMessage)
+	} else if message == "" || errMessage != "" {
+		w.WriteHeader(http.StatusNotFound)
+		errorMessage := "The ship's distress message could not be got"
 		json.NewEncoder(w).Encode(errorMessage)
 	} else {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(resp)
 	}
-
-	w.WriteHeader(http.StatusCreated)
 }
 
 // Post a satellite by POST into TopSecretSplit
 func PostTopSecretSplit(w http.ResponseWriter, r *http.Request) {
-
 	//a new model of request to load for the satellite in the Vars
 	var aNewShipRequest models.ShipToSatellite
 
@@ -63,8 +72,8 @@ func PostTopSecretSplit(w http.ResponseWriter, r *http.Request) {
 	aNewShipRequest.NameSatell = nameSatell
 	errShip := json.NewDecoder(r.Body).Decode(&aNewShipRequest)
 	if errShip != nil {
-		fmt.Fprintln(w, "Incorrect data. "+errShip.Error(), 400)
 		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintln(w, "Incorrect data. "+errShip.Error(), 400)
 		return
 	}
 
@@ -84,8 +93,9 @@ func PostTopSecretSplit(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//if we have more than 3 satellites, only we could get the message, but no the location
-	if len(NewShipRequest.ShipToSatellites) == 3 {
-		fmt.Fprintf(w, "Too many satellites")
+	if len(NewShipRequest.ShipToSatellites) > 3 {
+		fmt.Fprintf(w, "Too many satellites. Please re-enter data to satellites")
+		NewShipRequest.ShipToSatellites = nil
 		return
 	}
 
@@ -94,6 +104,14 @@ func PostTopSecretSplit(w http.ResponseWriter, r *http.Request) {
 	coordinates := functions.GetCoordinates(NewShipRequest.ShipToSatellites, TotalSatellitesOperating)
 	distances := functions.GetDistances(NewShipRequest.ShipToSatellites)
 	messages := functions.GetMessages(NewShipRequest.ShipToSatellites)
+
+	//if coordinates slice is nil, no satellite of those analyzed is operational
+	if coordinates == nil {
+		w.WriteHeader(http.StatusBadRequest)
+		errorMessage := "The location information of the ship could not be got since no satellite of those analyzed is operational"
+		json.NewEncoder(w).Encode(errorMessage)
+		return
+	}
 
 	// get the ubication and urgency message of the ship
 	//x, y := functions.GetLocation(distances...)
@@ -107,14 +125,17 @@ func PostTopSecretSplit(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	//For validation: X= 9999999999 and Y=9999999999 is an incorrect coordinate. These values are to represent an error in the GetLocation
-	if x == 9999999999 || y == 9999999999 || message == "" || errLocation != "" || errMessage != "" {
+	//For validation: X= 9999999999 and Y=9999999999 is an incorrect coordinate. These values are to represent an error in the GetLocation
+	if x == 9999999999 || y == 9999999999 || errLocation != "" {
 		w.WriteHeader(http.StatusNotFound)
-		errorMessage := "The ship information could not be got"
+		errorMessage := "The location information of the ship could not be got"
+		json.NewEncoder(w).Encode(errorMessage)
+	} else if message == "" || errMessage != "" {
+		w.WriteHeader(http.StatusNotFound)
+		errorMessage := "The ship's distress message could not be got"
 		json.NewEncoder(w).Encode(errorMessage)
 	} else {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(resp)
 	}
-
-	w.WriteHeader(http.StatusCreated)
 }

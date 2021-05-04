@@ -4,6 +4,21 @@
 {"name":"sato","distance":1000,"message":["este","","un","",""]}]}
 
 {"satellites":[
-{"name":"kenobi","distance":306.26,"message":["este","","","mensaje",""]},
-{"name":"skywalker","distance":505.0,"message":["","es","","","secreto"]},
-{"name":"sato","distance":200,"message":["este","","un","",""]}]}
+{"name":"kenobi","distance":1000.0,"message":["este","","","mensaje",""]},
+{"name":"skywalker","distance":800.555,"message":["","es","","","secreto"]},
+{"name":"sato","distance":2000,"message":["este","","un","",""]}]}
+
+{
+"distance": 450.89,
+"message": ["", "es", "un", "", ""]
+}
+
+{
+"distance": 100.0,
+"message": ["este", "", "", "mensaje", ""]
+}
+
+{
+"distance": 300.89,
+"message": ["", "", "", "", "oculto"]
+}

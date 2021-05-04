@@ -29,6 +29,7 @@ func Handlers() {
 	//give all security permissions to the handler
 	handler := cors.AllowAll().Handler(router)
 
+	log.Println("Listening...")
 	//listen and serve from the PORT through the handler
 	log.Fatal(http.ListenAndServe(":"+PORT, handler))
 }
