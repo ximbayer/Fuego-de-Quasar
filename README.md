@@ -11,5 +11,10 @@ db in mongo: fuegodequasar
 Git Repository: https://github.com/ximbayer/Fuego-de-Quasar.git
 
 Heroku Repository: fuego-quasar-lcarreras
-		   https://git.heroku.com/fuego-quasar-lcarreras.git
+		   URL principal: https://fuego-quasar-lcarreras.herokuapp.com
 		   
+Endpoints:	https://fuego-quasar-lcarreras.herokuapp.com/
+		https://fuego-quasar-lcarreras.herokuapp.com/topsecret
+		https://fuego-quasar-lcarreras.herokuapp.com/topsecret_split
+		https://fuego-quasar-lcarreras.herokuapp.com/topsecret_split/{satellite_name}
+
