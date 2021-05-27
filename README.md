@@ -1,5 +1,7 @@
 # Fuego-de-Quasar
 
+Documentation: in PDF file "Fuego de Quasar - Documentacion de Carreras Luciano.pdf"
+
 Data about repositories and DB connector:
 
 mongo connector with data:
